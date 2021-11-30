@@ -10,7 +10,14 @@ namespace Fulfillment.Models
         {
             get
             {
-                return Items.Sum(i => i.Cost);
+                var total = Items.Sum(i => i.Cost);
+
+                if (Items.Any(i => i.ShipmentPriorityType == ShipmentPriorityType.Speedy))
+                {
+                    total *= 2;
+                }
+
+                return total;
             }
         }
 
@@ -24,13 +31,19 @@ namespace Fulfillment.Models
     {
         public string Id { get; }
         public int Cost { get; }
-        public OrderItemType Type { get; }
+        public OrderItemType OrderItemType { get; }
+        public ShipmentPriorityType ShipmentPriorityType { get; set; }
 
-        public ShipmentCostItem(string id, int cost, OrderItemType type)
+        public ShipmentCostItem(
+            string id, 
+            int cost, 
+            OrderItemType orderItemType, 
+            ShipmentPriorityType shipmentPriorityType = ShipmentPriorityType.Normal)
         {
             Id = id;
             Cost = cost;
-            Type = type;
+            OrderItemType = orderItemType;
+            ShipmentPriorityType = shipmentPriorityType;
         }
     }
 }

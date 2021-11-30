@@ -5,8 +5,10 @@ namespace Fulfillment.Models
     public enum OrderItemType
     {
         Unknown = 0,
-        Parcel = 1
+        Parcel = 1,
+        NonItem = 2
     }
+
     public enum ItemSize
     {
         Unknown = 0,
@@ -16,13 +18,22 @@ namespace Fulfillment.Models
         XLarge = 4
     }
 
+    public enum ShipmentPriorityType
+    {
+        Unknown = 0,
+        Normal = 1,
+        Speedy = 2,
+    }
+
     public class OrderInput
     {
         public List<OrderInputItem> Items { get; }
+        public bool IsSpeedyShipping { get; }
 
-        public OrderInput(List<OrderInputItem> items)
+        public OrderInput(List<OrderInputItem> items, bool isSpeedyShipping = false)
         {
             Items = items;
+            IsSpeedyShipping = isSpeedyShipping;
         }
     }
 
@@ -30,14 +41,14 @@ namespace Fulfillment.Models
     {
         public string Id { get; }
         public int DimensionInCm { get; }
-        public OrderItemType Type { get; }
+        public OrderItemType OrderItemType { get; }
         public ItemSize Size { get; }
 
-        public OrderInputItem(string id, int dimensionInCm, OrderItemType type)
+        public OrderInputItem(string id, int dimensionInCm, OrderItemType orderItemType)
         {
             Id = id;
             DimensionInCm = dimensionInCm;
-            Type = type;
+            OrderItemType = orderItemType;
             Size = ConvertToSize(dimensionInCm);
         }
 

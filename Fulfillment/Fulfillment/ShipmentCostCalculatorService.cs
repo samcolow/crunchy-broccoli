@@ -14,21 +14,32 @@ namespace Fulfillment
 
         public ShipmentCostResult Calculate(OrderInput input)
         {
-            var items = ProcessInput(input);
+            var items = ProcessInputItems(input).ToList();
 
-            return new ShipmentCostResult(items.ToList());
+            return new ShipmentCostResult(items);
         }
 
-        IEnumerable<ShipmentCostItem> ProcessInput(OrderInput input)
+        IEnumerable<ShipmentCostItem> ProcessInputItems(OrderInput input)
         {
             foreach (var item in input.Items)
             {
                 var shippingCostItem = new ShipmentCostItem(
                     id: item.Id,
                     cost: GetCostBySize(item.Size),
-                    type: item.Type);
+                    orderItemType: item.OrderItemType);
 
                 yield return shippingCostItem;
+            }
+
+            if (input.IsSpeedyShipping)
+            {
+                var priorityLineItem = new ShipmentCostItem(
+                    id: "ShipmentPriorityType",
+                    cost: 0,
+                    orderItemType: OrderItemType.NonItem,
+                    shipmentPriorityType: ShipmentPriorityType.Speedy);
+
+                yield return priorityLineItem;
             }
         }
 

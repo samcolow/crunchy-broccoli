@@ -21,7 +21,7 @@ namespace Fulfillment.Tests
         [Test]
         public void Calculate_GivenOrderInput_ReturnsShipmentCostResult()
         {
-            var item = OrderInputItem(id: "123", dimensionInCm: 10, type: OrderItemType.Parcel);
+            var item = OrderInputItem(id: "123", dimensionInCm: 10, orderItemType: OrderItemType.Parcel);
             var orderInput = OrderInput(item);
             var result = _service.Calculate(orderInput);
 
@@ -40,7 +40,7 @@ namespace Fulfillment.Tests
         [TestCase("XLargeHigh", 1000, OrderItemType.Parcel, 25)]
         public void Calculate_GivenOrderItemWithDimension_ReturnsExpectedShipmentCost(string id, int dimensionInCm, OrderItemType type, int expectedCost)
         {
-            var item = OrderInputItem(id: id, dimensionInCm: dimensionInCm, type: type);
+            var item = OrderInputItem(id: id, dimensionInCm: dimensionInCm, orderItemType: type);
             var orderInput = OrderInput(item);
             var result = _service.Calculate(orderInput);
 
@@ -50,9 +50,9 @@ namespace Fulfillment.Tests
         [Test]
         public void Calculate_GivenMultipleOrderItem_ReturnsExpectedTotalCost()
         {
-            var item1 = OrderInputItem(id: "Small", dimensionInCm: 1, type: OrderItemType.Parcel);
-            var item2 = OrderInputItem(id: "Medium", dimensionInCm: 10, type: OrderItemType.Parcel);
-            var item3 = OrderInputItem(id: "Large", dimensionInCm: 50, type: OrderItemType.Parcel);
+            var item1 = OrderInputItem(id: "Small", dimensionInCm: 1, orderItemType: OrderItemType.Parcel);
+            var item2 = OrderInputItem(id: "Medium", dimensionInCm: 10, orderItemType: OrderItemType.Parcel);
+            var item3 = OrderInputItem(id: "Large", dimensionInCm: 50, orderItemType: OrderItemType.Parcel);
             var orderInput = OrderInput(item1, item2, item3);
             var result = _service.Calculate(orderInput);
 
@@ -61,14 +61,51 @@ namespace Fulfillment.Tests
             PAssert.IsTrue(() => result.TotalCost == expectedTotalCost);
         }
 
+        [Test]
+        public void Calculate_GivenSpeedyShippingSelected_ReturnsDoubledCostOfEntireOrder()
+        {
+            var item1 = OrderInputItem(id: "Small", dimensionInCm: 1, orderItemType: OrderItemType.Parcel);
+            var item2 = OrderInputItem(id: "Medium", dimensionInCm: 10, orderItemType: OrderItemType.Parcel);
+            var item3 = OrderInputItem(id: "Large", dimensionInCm: 50, orderItemType: OrderItemType.Parcel);
+            var orderInput = OrderInputWithSpeedyShipping(item1, item2, item3);
+            var result = _service.Calculate(orderInput);
+
+            var expectedTotalCost = ShipmentCostCalculatorService.SmallSizeCost + ShipmentCostCalculatorService.MediumSizeCost + ShipmentCostCalculatorService.LargeSizeCost;
+            var expectedSpeedyTotalCost = expectedTotalCost * 2;
+
+            PAssert.IsTrue(() => result.TotalCost == expectedSpeedyTotalCost);
+        }
+
+        [Test]
+        public void Calculate_GivenSpeedyShippingSelected_ReturnsResultWithSpeedyShippingItem()
+        {
+            var item1 = OrderInputItem(id: "Small", dimensionInCm: 1, orderItemType: OrderItemType.Parcel);
+            var item2 = OrderInputItem(id: "Medium", dimensionInCm: 10, orderItemType: OrderItemType.Parcel);
+            var item3 = OrderInputItem(id: "Large", dimensionInCm: 50, orderItemType: OrderItemType.Parcel);
+            var orderInput = OrderInputWithSpeedyShipping(item1, item2, item3);
+            var result = _service.Calculate(orderInput);
+
+            PAssert.IsTrue(() => result.Items.Any(i => i.ShipmentPriorityType == ShipmentPriorityType.Speedy));
+        }
+
         OrderInput OrderInput(params OrderInputItem[] item)
         {
             return new OrderInput(item.ToList());
         }
 
-        OrderInputItem OrderInputItem(string id, int dimensionInCm, OrderItemType type)
+        OrderInput OrderInputWithSpeedyShipping(params OrderInputItem[] item)
         {
-            return new OrderInputItem(id: id, dimensionInCm: dimensionInCm, type: type);
+            return new OrderInput(item.ToList(), isSpeedyShipping: true);
+        }
+
+        OrderInputItem OrderInputItem(string id, int dimensionInCm, OrderItemType orderItemType)
+        {
+            return new OrderInputItem(id: id, dimensionInCm: dimensionInCm, orderItemType: orderItemType);
+        }
+
+        ShipmentCostItem SpeedyShipmentCostItem()
+        {
+            return new ShipmentCostItem(id: "", cost: 0, orderItemType: OrderItemType.NonItem, ShipmentPriorityType.Speedy);
         }
     }
 }
