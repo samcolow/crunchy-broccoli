@@ -5,7 +5,7 @@ namespace Fulfillment.Models
 {
     public class ShipmentCostResult
     {
-        public List<ShipmentCostItem> Items { get; private set; }
+        public List<ShipmentCostItem> Items { get; }
         public int TotalCost
         {
             get
@@ -22,11 +22,11 @@ namespace Fulfillment.Models
 
     public class ShipmentCostItem
     {
-        public string Id { get; private set; }
-        public int Cost { get; private set; }
-        public string Type { get; private set; }
+        public string Id { get; }
+        public int Cost { get; }
+        public OrderItemType Type { get; }
 
-        public ShipmentCostItem(string id, int cost, string type)
+        public ShipmentCostItem(string id, int cost, OrderItemType type)
         {
             Id = id;
             Cost = cost;
