@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Fulfillment.Models
 {
@@ -43,6 +44,20 @@ namespace Fulfillment.Models
         public int DimensionInCm { get; }
         public OrderItemType OrderItemType { get; }
         public ItemSize Size { get; }
+        public int WeightLimitInKg
+        {
+            get
+            {
+                return Size switch
+                {
+                    ItemSize.Small => 1,
+                    ItemSize.Medium => 3,
+                    ItemSize.Large => 6,
+                    ItemSize.XLarge => 10,
+                    _ => throw new NotSupportedException(),
+                };
+            }
+        }
 
         public OrderInputItem(string id, int dimensionInCm, OrderItemType orderItemType)
         {
