@@ -16,7 +16,8 @@ namespace Fulfillment.Models
         Small = 1,
         Medium = 2,
         Large = 3,
-        XLarge = 4
+        XLarge = 4,
+        Heavy = 5
     }
 
     public enum ShipmentPriorityType
