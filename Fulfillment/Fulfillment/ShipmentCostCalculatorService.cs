@@ -1,16 +1,18 @@
-﻿using System;
+﻿using Fulfillment.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Fulfillment
 {
     public class ShipmentCostCalculatorService : IShipmentCostCalculatorService
     {
-        public void Calculate()
+        public ShipmentCostResult Calculate(OrderInput input)
         {
-            throw new NotImplementedException();
+            var shippingCostItem = new ShipmentCostItem("", 1, "");
+            
+            var items = new List<ShipmentCostItem>();
+            items.Add(shippingCostItem);
+
+            return new ShipmentCostResult(items);
         }
     }
 }

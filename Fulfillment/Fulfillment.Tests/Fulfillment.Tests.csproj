@@ -20,4 +20,8 @@
 		<ProjectReference Include="..\Fulfillment\Fulfillment.csproj" />
 	</ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Fulfillment\Fulfillment.csproj" />
+  </ItemGroup>
+
 </Project>

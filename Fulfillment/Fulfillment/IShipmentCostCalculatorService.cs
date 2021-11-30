@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Fulfillment.Models;
 
 namespace Fulfillment
 {
     public interface IShipmentCostCalculatorService
     {
-        void Calculate();
+        ShipmentCostResult Calculate(OrderInput input);
     }
 }
